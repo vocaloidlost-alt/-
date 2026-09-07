@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>消えた歌をさがす掲示板</title>
+<style>
+  :root{
+    --ink:#2a2a2a;
+    --bg:#f5f4f0;
+    --line:#d8d6cf;
+    --accent:#6b5b4f;
+    --muted:#8a8578;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    min-height:100vh;
+    padding:40px 16px 64px;
+  }
+  .wrap{max-width:560px;margin:0 auto;}
+
+  header{margin-bottom:28px;}
+  h1{
+    font-weight:700;
+    font-size:19px;
+    line-height:1.6;
+    margin:0;
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    padding:28px 24px;
+  }
+
+  .tabs{
+    display:flex;
+    gap:0;
+    margin-bottom:24px;
+    border-bottom:1px solid var(--line);
+  }
+  .tab{
+    flex:1;
+    background:none;
+    border:none;
+    font-weight:700;
+    font-size:14.5px;
+    padding:8px 6px 12px;
+    color:var(--muted);
+    cursor:pointer;
+    position:relative;
+  }
+  .tab[aria-selected="true"]{color:var(--ink);}
+  .tab[aria-selected="true"]::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:-1px;
+    height:2px;
+    background:var(--accent);
+  }
+
+  .field{margin-bottom:18px;}
+  .field.is-hidden{display:none;}
+  .field label{
+    display:block;
+    font-size:12.5px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .field .hint{
+    font-size:11.5px;
+    color:var(--muted);
+    font-weight:400;
+    margin-left:6px;
+  }
+  .field input[type=text],
+  .field textarea{
+    width:100%;
+    font-family:inherit;
+    font-size:14.5px;
+    padding:9px 10px;
+    background:#fff;
+    border:1px solid var(--line);
+    color:var(--ink);
+  }
+  .field input:focus,
+  .field textarea:focus{
+    outline:1px solid var(--accent);
+    outline-offset:0;
+  }
+  .field textarea{resize:vertical;min-height:160px;line-height:1.6;}
+
+  /* ハニーポット(見えない罠フィールド) */
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+
+  .submit{
+    width:100%;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    font-weight:700;
+    font-size:14.5px;
+    padding:12px;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .submit:hover{opacity:.9;}
+  .submit:disabled{background:var(--muted);cursor:default;}
+
+  .note{
+    font-size:11.5px;
+    color:var(--muted);
+    margin-top:12px;
+    line-height:1.7;
+  }
+
+  .done{display:none;text-align:center;padding:20px 10px 10px;}
+  .done.show{display:block;}
+  .done .stamp{
+    display:inline-block;
+    font-weight:700;
+    font-size:14px;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    padding:6px 16px;
+    margin-bottom:14px;
+  }
+  .done p{font-size:13.5px;line-height:1.8;color:#555;}
+
+  form.hidden{display:none;}
+
+  footer{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--muted);
+    margin-top:20px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>情報提供・掲載依頼用フォーム</h1>
+  </header>
+
+  <div class="card">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-type="info">情報提供</button>
+      <button class="tab" role="tab" aria-selected="false" data-type="post">掲載依頼</button>
+    </div>
+
+    <form id="tipForm" novalidate>
+      <!-- ハニーポット: 人間には見えない。botが埋めたら送信を中止する -->
+      <div class="hp" aria-hidden="true">
+        <label for="website">Website</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="subject" id="subjectLabel">件名</label>
+        <input type="text" id="subject" name="subject" required placeholder="">
+      </div>
+
+      <div class="field">
+        <label for="content" id="contentLabel">内容</label>
+        <textarea id="content" name="content" required placeholder=""></textarea>
+      </div>
+
+      <div class="field" id="linkField">
+        <label for="link">データ等のURL<span class="hint">任意</span></label>
+        <input type="text" id="link" name="link" placeholder="ギガファイル便、Googleドライブ等">
+      </div>
+
+      <div class="field">
+        <label for="xid">XのID<span class="hint">任意</span></label>
+        <input type="text" id="xid" name="xid" placeholder="@から始まるID">
+      </div>
+
+      <button type="submit" class="submit" id="submitBtn">送信する</button>
+      <p class="note">送信内容は運営者本人のみが確認します。第三者には公開されません。</p>
+    </form>
+
+    <div class="done" id="done">
+      <span class="stamp">受理</span>
+      <p>情報を受け取りました。ありがとうございます。<br>内容を確認のうえ、必要に応じて調査・拡散を行います。</p>
+    </div>
+  </div>
+
+  <footer>心当たりが少しでもあれば、些細なことでも構いません。</footer>
+</div>
+
+<script>
+/* =========================================================================
+ * GoogleフォームID・ENTRY(entry.XXXXXXXX)ともに反映済みです。
+ * ========================================================================= */
+const GOOGLE_FORM_ID = "1FAIpQLSff7x8hHztDZAHrXpcqFGTE5ht9xhdCnZJp2HFK-Y6cUhHOIw";
+const ENTRY = {
+  type:    "entry.158317043",  // 種別(情報提供 / 掲載依頼)
+  subject: "entry.708817122",  // 件名
+  content: "entry.1342331548", // 内容
+  link:    "entry.531684209",  // データ等のURL(任意)
+  xid:     "entry.137808269",  // XのID(任意)
+};
+/* ========================================================================= */
+
+const form = document.getElementById('tipForm');
+const done = document.getElementById('done');
+const submitBtn = document.getElementById('submitBtn');
+const tabs = document.querySelectorAll('.tab');
+const subjectLabel = document.getElementById('subjectLabel');
+const subjectInput = document.getElementById('subject');
+const contentLabel = document.getElementById('contentLabel');
+const contentInput = document.getElementById('content');
+const linkField = document.getElementById('linkField');
+
+let currentType = 'info';
+
+const copy = {
+  info: {
+    subjectLabel: '件名',
+    subjectPlaceholder: '',
+    contentLabel: '詳細',
+    contentPlaceholder: '',
+    showLink: true,
+  },
+  post: {
+    subjectLabel: '掲載して欲しい楽曲',
+    subjectPlaceholder: '曲名・アーティスト名など',
+    contentLabel: '詳細',
+    contentPlaceholder: '',
+    showLink: false,
+  }
+};
+
+function applyType(type){
+  currentType = type;
+  tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.type === type ? 'true' : 'false'));
+  subjectLabel.textContent = copy[type].subjectLabel;
+  subjectInput.placeholder = copy[type].subjectPlaceholder;
+  contentLabel.textContent = copy[type].contentLabel;
+  contentInput.placeholder = copy[type].contentPlaceholder;
+  linkField.classList.toggle('is-hidden', !copy[type].showLink);
+}
+
+tabs.forEach(tab => tab.addEventListener('click', () => applyType(tab.dataset.type)));
+applyType('info');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // ハニーポットが埋まっていたらbotとみなして黙って処理を止める
+  if (document.getElementById('website').value) return;
+
+  if (!form.checkValidity()){
+    form.reportValidity();
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = '送信中…';
+
+  const data = {
+    type: currentType === 'info' ? '情報提供' : '掲載依頼',
+    subject: document.getElementById('subject').value,
+    content: document.getElementById('content').value,
+    link: currentType === 'info' ? document.getElementById('link').value : '',
+    xid: document.getElementById('xid').value,
+  };
+
+  try{
+    await submitToGoogleForm(data);
+  }catch(err){
+    // no-corsのため通常ここには来ないが、ネットワークエラー等の保険
+    console.error(err);
+  }
+
+  form.classList.add('hidden');
+  done.classList.add('show');
+});
+
+async function submitToGoogleForm(data){
+  const endpoint = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`;
+  const body = new FormData();
+  body.append(ENTRY.type, data.type);
+  body.append(ENTRY.subject, data.subject);
+  body.append(ENTRY.content, data.content);
+  body.append(ENTRY.link, data.link);
+  body.append(ENTRY.xid, data.xid);
+
+  // Googleフォームはno-corsでのみ受け付けるため、送信成否はJS側から読み取れない
+  return fetch(endpoint, { method: 'POST', mode: 'no-cors', body });
+}
+</script>
+</body>
+</html>
