@@ -78,14 +78,37 @@
 
   form.hidden{display:none;}
 
-  .history h2{font-size:14.5px;margin:0 0 16px;}
-  .history .refresh{float:right;font-size:11.5px;color:var(--accent);cursor:pointer;text-decoration:underline;}
-  .thread-item{border-left:2px solid var(--line);padding:2px 0 2px 14px;margin-bottom:16px;}
-  .thread-item.reply{border-left-color:var(--accent);}
-  .thread-item .meta{font-size:11px;color:var(--muted);margin-bottom:4px;}
-  .thread-item .meta .who{font-weight:700;}
-  .thread-item .body{font-size:13.5px;line-height:1.7;white-space:pre-wrap;}
+  .main-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--line);}
+  .main-tab{flex:1;background:none;border:none;font-weight:700;font-size:15px;padding:10px 6px 14px;color:var(--muted);cursor:pointer;position:relative;}
+  .main-tab.active{color:var(--ink);}
+  .main-tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--accent);}
+
+  .history-item{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:14px 4px;border-bottom:1px solid var(--line);cursor:pointer;
+  }
+  .history-item:last-child{border-bottom:none;}
+  .history-item .subject{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .history-item .meta{font-size:11px;color:var(--muted);white-space:nowrap;}
+  .history-item .chevron{color:var(--muted);font-size:14px;}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:10px;margin-right:8px;}
+  .badge.pending{background:#fbe9e5;color:#b5533c;}
+  .badge.done{background:#e7f0e9;color:#4a7a5c;}
+
+  .back-btn{
+    background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;
+    padding:0 0 18px;cursor:pointer;
+  }
+  .detail-subject{font-size:15.5px;font-weight:700;margin-bottom:4px;}
+  .detail-meta{font-size:11.5px;color:var(--muted);margin-bottom:18px;}
+
+  .detail-block{border-left:2px solid var(--line);padding:2px 0 2px 14px;margin-bottom:16px;}
+  .detail-block.reply{border-left-color:var(--accent);}
+  .detail-block .who{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px;}
+  .detail-block .body{font-size:13.5px;line-height:1.7;white-space:pre-wrap;}
+
   .empty-state{font-size:12.5px;color:var(--muted);text-align:center;padding:20px 0;}
+
 
   footer{text-align:center;font-size:11.5px;color:var(--muted);margin-top:20px;}
 </style>
@@ -95,57 +118,79 @@
 
   <header>
     <h1>情報提供・掲載依頼用フォーム</h1>
-    <p>匿名のまま、あなたと個別にやり取りできます。このブラウザを開けば、送信内容や運営からの返信を下の「これまでのやり取り」で確認できます。</p>
+    <p>匿名のまま、あなたと個別にやり取りできます。「履歴」タブから、これまでの送信内容や運営からの返信を確認できます。</p>
   </header>
 
-  <p class="switch-code">別の端末でも続きを見たい場合は <a id="saveLinkBtn">このページの保存用リンクをコピー</a></p>
+  <div class="main-tabs">
+    <button class="main-tab active" data-section="submit">送信</button>
+    <button class="main-tab" data-section="history">履歴</button>
+  </div>
 
-  <div class="card">
-    <div class="tabs" role="tablist">
-      <button class="tab" role="tab" aria-selected="true" data-type="情報提供">情報提供</button>
-      <button class="tab" role="tab" aria-selected="false" data-type="掲載依頼">掲載依頼</button>
-    </div>
+  <!-- ==================== 送信タブ ==================== -->
+  <div id="submitSection">
 
-    <form id="tipForm" novalidate>
-      <div class="hp" aria-hidden="true">
-        <label for="website">Website</label>
-        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+    <p class="switch-code">別の端末でも続きを見たい場合は <a id="saveLinkBtn">このページの保存用リンクをコピー</a></p>
+
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" data-type="情報提供">情報提供</button>
+        <button class="tab" role="tab" aria-selected="false" data-type="掲載依頼">掲載依頼</button>
       </div>
 
-      <div class="field">
-        <label for="subject" id="subjectLabel">件名</label>
-        <input type="text" id="subject" required maxlength="200" placeholder="">
+      <form id="tipForm" novalidate>
+        <div class="hp" aria-hidden="true">
+          <label for="website">Website</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="subject" id="subjectLabel">件名</label>
+          <input type="text" id="subject" required maxlength="200" placeholder="">
+        </div>
+
+        <div class="field">
+          <label for="content" id="contentLabel">内容</label>
+          <textarea id="content" required maxlength="3000" placeholder=""></textarea>
+        </div>
+
+        <div class="field" id="linkField">
+          <label for="link">データ等のURL<span class="hint">任意</span></label>
+          <input type="text" id="link" maxlength="500" placeholder="ギガファイル便、Googleドライブ等">
+        </div>
+
+        <div class="field">
+          <label for="xid">XのID<span class="hint">任意</span></label>
+          <input type="text" id="xid" maxlength="50" placeholder="@から始まるID">
+        </div>
+
+        <button type="submit" class="submit" id="submitBtn">送信する</button>
+        <p class="note">送信内容は運営者本人のみが確認します。第三者には公開されません。</p>
+      </form>
+
+      <div class="done" id="done">
+        <span class="stamp">送信済み</span>
+        <p>送信が完了しました。<br>「履歴」タブに反映されるまで少し時間がかかることがあります。</p>
       </div>
-
-      <div class="field">
-        <label for="content" id="contentLabel">内容</label>
-        <textarea id="content" required maxlength="3000" placeholder=""></textarea>
-      </div>
-
-      <div class="field" id="linkField">
-        <label for="link">データ等のURL<span class="hint">任意</span></label>
-        <input type="text" id="link" maxlength="500" placeholder="ギガファイル便、Googleドライブ等">
-      </div>
-
-      <div class="field">
-        <label for="xid">XのID<span class="hint">任意</span></label>
-        <input type="text" id="xid" maxlength="50" placeholder="@から始まるID">
-      </div>
-
-      <button type="submit" class="submit" id="submitBtn">送信する</button>
-      <p class="note">送信内容は運営者本人のみが確認します。第三者には公開されません。</p>
-    </form>
-
-    <div class="done" id="done">
-      <span class="stamp">送信済み</span>
-      <p>送信が完了しました。<br>下の「やり取り」欄に反映されるまで少し時間がかかることがあります。</p>
     </div>
   </div>
 
-  <div class="card history">
-    <h2>これまでのやり取り <span class="refresh" id="refreshBtn">更新</span></h2>
-    <div id="threadList">
-      <p class="empty-state">まだやり取りはありません。</p>
+  <!-- ==================== 履歴タブ ==================== -->
+  <div id="historySection" style="display:none;">
+    <div class="card">
+
+      <!-- 一覧表示 -->
+      <div id="historyListView">
+        <div id="historyList">
+          <p class="empty-state">まだ送信履歴はありません。</p>
+        </div>
+      </div>
+
+      <!-- 詳細表示 -->
+      <div id="historyDetailView" style="display:none;">
+        <button type="button" class="back-btn" id="backBtn">← 一覧に戻る</button>
+        <div id="historyDetailContent"></div>
+      </div>
+
     </div>
   </div>
 
@@ -173,10 +218,14 @@ const subjectInput = document.getElementById('subject');
 const contentLabel = document.getElementById('contentLabel');
 const contentInput = document.getElementById('content');
 const linkField = document.getElementById('linkField');
-const threadList = document.getElementById('threadList');
 const toast = document.getElementById('toast');
+const historyList = document.getElementById('historyList');
+const historyListView = document.getElementById('historyListView');
+const historyDetailView = document.getElementById('historyDetailView');
+const historyDetailContent = document.getElementById('historyDetailContent');
 
 let currentType = '情報提供';
+let historyRows = [];
 
 function showToast(msg){
   toast.textContent = msg;
@@ -220,52 +269,91 @@ document.getElementById('saveLinkBtn').addEventListener('click', () => {
   });
 });
 
-/* ---------- 送信内容・返信の取得と表示(すべてGAS側から取得) ---------- */
+/* ---------- メインタブ(送信/履歴)の切り替え ---------- */
+const submitSection = document.getElementById('submitSection');
+const historySection = document.getElementById('historySection');
+
+document.querySelectorAll('.main-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.main-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const isHistory = btn.dataset.section === 'history';
+    submitSection.style.display = isHistory ? 'none' : '';
+    historySection.style.display = isHistory ? '' : 'none';
+    if(isHistory){
+      showHistoryList();
+      fetchThread();
+    }
+  });
+});
+
+/* ---------- 履歴の取得・一覧表示・詳細表示 ---------- */
 async function fetchThread(){
   if(WEBAPP_URL.includes('【')) return; // 未設定の場合は何もしない
   try{
     const res = await fetch(`${WEBAPP_URL}?action=thread&code=${encodeURIComponent(threadCode)}&_=${Date.now()}`);
-    const rows = await res.json();
-    renderThread(rows);
+    historyRows = await res.json();
+    renderHistoryList();
   }catch(e){
-    console.error('やり取りの取得に失敗しました', e);
+    console.error('履歴の取得に失敗しました', e);
   }
 }
 
-function renderThread(rows){
-  if(!rows || rows.length === 0){
-    threadList.innerHTML = '<p class="empty-state">まだやり取りはありません。</p>';
+function renderHistoryList(){
+  if(!historyRows || historyRows.length === 0){
+    historyList.innerHTML = '<p class="empty-state">まだ送信履歴はありません。</p>';
     return;
   }
-
-  const items = [];
-  rows.forEach(r => {
-    items.push({ kind:'mine', ts:r.ts, subject:r.subject, content:r.content });
-    if(r.reply){
-      items.push({ kind:'reply', ts:r.ts, content:r.reply });
-    }
-  });
-
-  threadList.innerHTML = items.map(item => {
-    if(item.kind === 'mine'){
-      return `<div class="thread-item">
-        <div class="meta"><span class="who">あなた</span>${item.ts ? ' ・ ' + item.ts : ''}</div>
-        <div class="body">${escapeHtml(item.subject ? '【'+item.subject+'】\n' : '') + escapeHtml(item.content || '')}</div>
+  // 新しいものを上に
+  const rows = [...historyRows].reverse();
+  historyList.innerHTML = rows.map((r, i) => {
+    const originalIndex = historyRows.length - 1 - i;
+    const status = r.status || '未対応';
+    const badgeClass = status === '対応済み' ? 'done' : 'pending';
+    return `
+      <div class="history-item" onclick="openHistoryDetail(${originalIndex})">
+        <div class="subject"><span class="badge ${badgeClass}">${status}</span>${escapeHtml(r.subject || '(件名なし)')}</div>
+        <div class="chevron">›</div>
       </div>`;
-    } else {
-      return `<div class="thread-item reply">
-        <div class="meta"><span class="who">運営</span></div>
-        <div class="body">${escapeHtml(item.content || '')}</div>
-      </div>`;
-    }
   }).join('');
 }
+
+function openHistoryDetail(index){
+  const r = historyRows[index];
+  if(!r) return;
+
+  historyDetailContent.innerHTML = `
+    <div class="detail-subject">${escapeHtml(r.subject || '(件名なし)')}</div>
+    <div class="detail-meta">${escapeHtml(r.type || '')}${r.ts ? ' ・ ' + escapeHtml(r.ts) : ''}</div>
+    <div class="detail-block">
+      <div class="who">あなた</div>
+      <div class="body">${escapeHtml(r.content || '')}</div>
+    </div>
+    ${r.reply ? `
+    <div class="detail-block reply">
+      <div class="who">運営からの返信</div>
+      <div class="body">${escapeHtml(r.reply)}</div>
+    </div>` : `
+    <div class="detail-block">
+      <div class="who">運営からの返信</div>
+      <div class="body empty-state" style="padding:4px 0;">まだ返信はありません</div>
+    </div>`}
+  `;
+
+  historyListView.style.display = 'none';
+  historyDetailView.style.display = '';
+}
+
+function showHistoryList(){
+  historyDetailView.style.display = 'none';
+  historyListView.style.display = '';
+}
+
+document.getElementById('backBtn').addEventListener('click', showHistoryList);
 
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-
-document.getElementById('refreshBtn').addEventListener('click', fetchThread);
 
 /* ---------- タブ切り替え ---------- */
 const copy = {
