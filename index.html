@@ -24,121 +24,70 @@
   .wrap{max-width:560px;margin:0 auto;}
 
   header{margin-bottom:28px;}
-  h1{
-    font-weight:700;
-    font-size:19px;
-    line-height:1.6;
-    margin:0;
-  }
+  h1{font-weight:700;font-size:19px;line-height:1.6;margin:0 0 6px;}
+  header p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.7;}
 
-  .card{
-    background:#fff;
-    border:1px solid var(--line);
-    padding:28px 24px;
-  }
+  .card{background:#fff;border:1px solid var(--line);padding:28px 24px;margin-bottom:20px;}
 
-  .tabs{
-    display:flex;
-    gap:0;
-    margin-bottom:24px;
-    border-bottom:1px solid var(--line);
+  .switch-code{font-size:11.5px;color:var(--muted);margin:-8px 0 20px;text-align:right;}
+  .switch-code a{color:var(--accent);cursor:pointer;text-decoration:underline;}
+
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+    background:var(--ink);color:#fff;font-size:12.5px;padding:9px 16px;
+    opacity:0;pointer-events:none;transition:opacity .2s;
   }
-  .tab{
-    flex:1;
-    background:none;
-    border:none;
-    font-weight:700;
-    font-size:14.5px;
-    padding:8px 6px 12px;
-    color:var(--muted);
-    cursor:pointer;
-    position:relative;
-  }
+  .toast.show{opacity:1;}
+
+  .tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--line);}
+  .tab{flex:1;background:none;border:none;font-weight:700;font-size:14.5px;padding:8px 6px 12px;color:var(--muted);cursor:pointer;position:relative;}
   .tab[aria-selected="true"]{color:var(--ink);}
-  .tab[aria-selected="true"]::after{
-    content:"";
-    position:absolute;
-    left:0; right:0; bottom:-1px;
-    height:2px;
-    background:var(--accent);
-  }
+  .tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent);}
 
   .field{margin-bottom:18px;}
   .field.is-hidden{display:none;}
-  .field label{
-    display:block;
-    font-size:12.5px;
-    font-weight:700;
-    margin-bottom:6px;
-  }
-  .field .hint{
-    font-size:11.5px;
-    color:var(--muted);
-    font-weight:400;
-    margin-left:6px;
-  }
+  .field label{display:block;font-size:12.5px;font-weight:700;margin-bottom:6px;}
+  .field .hint{font-size:11.5px;color:var(--muted);font-weight:400;margin-left:6px;}
   .field input[type=text],
   .field textarea{
-    width:100%;
-    font-family:inherit;
-    font-size:14.5px;
-    padding:9px 10px;
-    background:#fff;
-    border:1px solid var(--line);
-    color:var(--ink);
+    width:100%;font-family:inherit;font-size:16px;padding:9px 10px;
+    background:#fff;border:1px solid var(--line);color:var(--ink);
   }
   .field input:focus,
-  .field textarea:focus{
-    outline:1px solid var(--accent);
-    outline-offset:0;
-  }
+  .field textarea:focus{outline:1px solid var(--accent);outline-offset:0;}
   .field textarea{resize:vertical;min-height:160px;line-height:1.6;}
 
-  /* ハニーポット(見えない罠フィールド) */
   .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
 
   .submit{
-    width:100%;
-    background:var(--accent);
-    color:#fff;
-    border:none;
-    font-weight:700;
-    font-size:14.5px;
-    padding:12px;
-    cursor:pointer;
-    margin-top:4px;
+    width:100%;background:var(--accent);color:#fff;border:none;
+    font-weight:700;font-size:14.5px;padding:12px;cursor:pointer;margin-top:4px;
   }
   .submit:hover{opacity:.9;}
   .submit:disabled{background:var(--muted);cursor:default;}
 
-  .note{
-    font-size:11.5px;
-    color:var(--muted);
-    margin-top:12px;
-    line-height:1.7;
-  }
+  .note{font-size:11.5px;color:var(--muted);margin-top:12px;line-height:1.7;}
 
   .done{display:none;text-align:center;padding:20px 10px 10px;}
   .done.show{display:block;}
   .done .stamp{
-    display:inline-block;
-    font-weight:700;
-    font-size:14px;
-    color:var(--accent);
-    border:1px solid var(--accent);
-    padding:6px 16px;
-    margin-bottom:14px;
+    display:inline-block;font-weight:700;font-size:14px;color:var(--accent);
+    border:1px solid var(--accent);padding:6px 16px;margin-bottom:14px;
   }
   .done p{font-size:13.5px;line-height:1.8;color:#555;}
 
   form.hidden{display:none;}
 
-  footer{
-    text-align:center;
-    font-size:11.5px;
-    color:var(--muted);
-    margin-top:20px;
-  }
+  .history h2{font-size:14.5px;margin:0 0 16px;}
+  .history .refresh{float:right;font-size:11.5px;color:var(--accent);cursor:pointer;text-decoration:underline;}
+  .thread-item{border-left:2px solid var(--line);padding:2px 0 2px 14px;margin-bottom:16px;}
+  .thread-item.reply{border-left-color:var(--accent);}
+  .thread-item .meta{font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .thread-item .meta .who{font-weight:700;}
+  .thread-item .body{font-size:13.5px;line-height:1.7;white-space:pre-wrap;}
+  .empty-state{font-size:12.5px;color:var(--muted);text-align:center;padding:20px 0;}
+
+  footer{text-align:center;font-size:11.5px;color:var(--muted);margin-top:20px;}
 </style>
 </head>
 <body>
@@ -146,16 +95,18 @@
 
   <header>
     <h1>情報提供・掲載依頼用フォーム</h1>
+    <p>匿名のまま、あなたと個別にやり取りできます。このブラウザを開けば、送信内容や運営からの返信を下の「これまでのやり取り」で確認できます。</p>
   </header>
+
+  <p class="switch-code">別の端末でも続きを見たい場合は <a id="saveLinkBtn">このページの保存用リンクをコピー</a></p>
 
   <div class="card">
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" aria-selected="true" data-type="info">情報提供</button>
-      <button class="tab" role="tab" aria-selected="false" data-type="post">掲載依頼</button>
+      <button class="tab" role="tab" aria-selected="true" data-type="情報提供">情報提供</button>
+      <button class="tab" role="tab" aria-selected="false" data-type="掲載依頼">掲載依頼</button>
     </div>
 
     <form id="tipForm" novalidate>
-      <!-- ハニーポット: 人間には見えない。botが埋めたら送信を中止する -->
       <div class="hp" aria-hidden="true">
         <label for="website">Website</label>
         <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
@@ -163,22 +114,22 @@
 
       <div class="field">
         <label for="subject" id="subjectLabel">件名</label>
-        <input type="text" id="subject" name="subject" required placeholder="">
+        <input type="text" id="subject" required maxlength="200" placeholder="">
       </div>
 
       <div class="field">
         <label for="content" id="contentLabel">内容</label>
-        <textarea id="content" name="content" required placeholder=""></textarea>
+        <textarea id="content" required maxlength="3000" placeholder=""></textarea>
       </div>
 
       <div class="field" id="linkField">
         <label for="link">データ等のURL<span class="hint">任意</span></label>
-        <input type="text" id="link" name="link" placeholder="ギガファイル便、Googleドライブ等">
+        <input type="text" id="link" maxlength="500" placeholder="ギガファイル便、Googleドライブ等">
       </div>
 
       <div class="field">
         <label for="xid">XのID<span class="hint">任意</span></label>
-        <input type="text" id="xid" name="xid" placeholder="@から始まるID">
+        <input type="text" id="xid" maxlength="50" placeholder="@から始まるID">
       </div>
 
       <button type="submit" class="submit" id="submitBtn">送信する</button>
@@ -187,24 +138,31 @@
 
     <div class="done" id="done">
       <span class="stamp">送信済み</span>
-      <p>送信が完了しました。<br>ありがとうございました。</p>
+      <p>送信が完了しました。<br>下の「やり取り」欄に反映されるまで少し時間がかかることがあります。</p>
     </div>
   </div>
+
+  <div class="card history">
+    <h2>これまでのやり取り <span class="refresh" id="refreshBtn">更新</span></h2>
+    <div id="threadList">
+      <p class="empty-state">まだやり取りはありません。</p>
+    </div>
+  </div>
+
+  <footer>やり取りの記録はこのブラウザにのみ保存されます。</footer>
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
 /* =========================================================================
- * GoogleフォームID・ENTRY(entry.XXXXXXXX)ともに反映済みです。
+ * 設定値。GAS側を「ウェブアプリとしてデプロイ」した後に発行されるURLに置き換えてください。
+ * (Apps Scriptエディタ→デプロイ→新しいデプロイ→種類:ウェブアプリ
+ *  →実行ユーザー:自分、アクセスできるユーザー:全員 でデプロイして得られるURL)
  * ========================================================================= */
-const GOOGLE_FORM_ID = "1FAIpQLSff7x8hHztDZAHrXpcqFGTE5ht9xhdCnZJp2HFK-Y6cUhHOIw";
-const ENTRY = {
-  type:    "entry.158317043",  // 種別(情報提供 / 掲載依頼)
-  subject: "entry.708817122",  // 件名
-  content: "entry.1342331548", // 内容
-  link:    "entry.531684209",  // データ等のURL(任意)
-  xid:     "entry.137808269",  // XのID(任意)
-};
+const WEBAPP_URL = "https://script.google.com/macros/s/【ここにデプロイIDを設定】/exec";
 /* ========================================================================= */
+
+const LS_CODE_KEY = 'tip_thread_code';
 
 const form = document.getElementById('tipForm');
 const done = document.getElementById('done');
@@ -215,24 +173,104 @@ const subjectInput = document.getElementById('subject');
 const contentLabel = document.getElementById('contentLabel');
 const contentInput = document.getElementById('content');
 const linkField = document.getElementById('linkField');
+const threadList = document.getElementById('threadList');
+const toast = document.getElementById('toast');
 
-let currentType = 'info';
+let currentType = '情報提供';
 
-const copy = {
-  info: {
-    subjectLabel: '件名',
-    subjectPlaceholder: '',
-    contentLabel: '詳細',
-    contentPlaceholder: '',
-    showLink: true,
-  },
-  post: {
-    subjectLabel: '掲載して欲しい楽曲',
-    subjectPlaceholder: '曲名・アーティスト名など',
-    contentLabel: '詳細',
-    contentPlaceholder: '',
-    showLink: false,
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 2000);
+}
+
+/* ---------- スレッドコードの発行・管理(裏側で自動、通常は非表示) ---------- */
+function generateCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 紛らわしい文字(0/O, 1/I等)を除外
+  let code = '';
+  for(let i=0;i<8;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function getOrCreateThreadCode(){
+  let code = localStorage.getItem(LS_CODE_KEY);
+  if(!code){
+    code = generateCode();
+    localStorage.setItem(LS_CODE_KEY, code);
   }
+  return code;
+}
+
+// URLに ?c=XXXXXXXX が付いている場合は、そのコードを復元して以後使用する
+// (別端末で「保存用リンク」を開いたときのため)
+const urlCode = new URLSearchParams(location.search).get('c');
+if(urlCode && /^[A-Z0-9]{6,12}$/i.test(urlCode)){
+  localStorage.setItem(LS_CODE_KEY, urlCode.toUpperCase());
+  history.replaceState(null, '', location.pathname);
+}
+
+let threadCode = getOrCreateThreadCode();
+
+document.getElementById('saveLinkBtn').addEventListener('click', () => {
+  const url = `${location.origin}${location.pathname}?c=${threadCode}`;
+  navigator.clipboard?.writeText(url).then(()=>{
+    showToast('リンクをコピーしました。別端末でこのリンクを開いてください');
+  }).catch(()=>{
+    prompt('このURLをコピーしてください', url);
+  });
+});
+
+/* ---------- 送信内容・返信の取得と表示(すべてGAS側から取得) ---------- */
+async function fetchThread(){
+  if(WEBAPP_URL.includes('【')) return; // 未設定の場合は何もしない
+  try{
+    const res = await fetch(`${WEBAPP_URL}?action=thread&code=${encodeURIComponent(threadCode)}&_=${Date.now()}`);
+    const rows = await res.json();
+    renderThread(rows);
+  }catch(e){
+    console.error('やり取りの取得に失敗しました', e);
+  }
+}
+
+function renderThread(rows){
+  if(!rows || rows.length === 0){
+    threadList.innerHTML = '<p class="empty-state">まだやり取りはありません。</p>';
+    return;
+  }
+
+  const items = [];
+  rows.forEach(r => {
+    items.push({ kind:'mine', ts:r.ts, subject:r.subject, content:r.content });
+    if(r.reply){
+      items.push({ kind:'reply', ts:r.ts, content:r.reply });
+    }
+  });
+
+  threadList.innerHTML = items.map(item => {
+    if(item.kind === 'mine'){
+      return `<div class="thread-item">
+        <div class="meta"><span class="who">あなた</span>${item.ts ? ' ・ ' + item.ts : ''}</div>
+        <div class="body">${escapeHtml(item.subject ? '【'+item.subject+'】\n' : '') + escapeHtml(item.content || '')}</div>
+      </div>`;
+    } else {
+      return `<div class="thread-item reply">
+        <div class="meta"><span class="who">運営</span></div>
+        <div class="body">${escapeHtml(item.content || '')}</div>
+      </div>`;
+    }
+  }).join('');
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+document.getElementById('refreshBtn').addEventListener('click', fetchThread);
+
+/* ---------- タブ切り替え ---------- */
+const copy = {
+  '情報提供': { subjectLabel:'件名', subjectPlaceholder:'', contentLabel:'詳細', contentPlaceholder:'', showLink:true },
+  '掲載依頼': { subjectLabel:'掲載して欲しい楽曲', subjectPlaceholder:'曲名・アーティスト名など', contentLabel:'詳細', contentPlaceholder:'', showLink:false },
 };
 
 function applyType(type){
@@ -246,13 +284,13 @@ function applyType(type){
 }
 
 tabs.forEach(tab => tab.addEventListener('click', () => applyType(tab.dataset.type)));
-applyType('info');
+applyType('情報提供');
 
+/* ---------- 送信処理 ---------- */
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  // ハニーポットが埋まっていたらbotとみなして黙って処理を止める
-  if (document.getElementById('website').value) return;
+  if (document.getElementById('website').value) return; // ハニーポット
 
   if (!form.checkValidity()){
     form.reportValidity();
@@ -263,36 +301,40 @@ form.addEventListener('submit', async (e) => {
   submitBtn.textContent = '送信中…';
 
   const data = {
-    type: currentType === 'info' ? '情報提供' : '掲載依頼',
+    type: currentType,
     subject: document.getElementById('subject').value,
     content: document.getElementById('content').value,
-    link: currentType === 'info' ? document.getElementById('link').value : '',
+    link: currentType === '情報提供' ? document.getElementById('link').value : '',
     xid: document.getElementById('xid').value,
+    threadCode: threadCode,
   };
 
   try{
-    await submitToGoogleForm(data);
+    // Content-Typeを指定しない(text/plain扱い)ことでCORSのプリフライトを回避しつつGAS側でJSONとして受け取る
+    await fetch(WEBAPP_URL, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }catch(err){
-    // no-corsのため通常ここには来ないが、ネットワークエラー等の保険
     console.error(err);
   }
 
   form.classList.add('hidden');
   done.classList.add('show');
+
+  setTimeout(() => {
+    form.classList.remove('hidden');
+    done.classList.remove('show');
+    form.reset();
+    submitBtn.disabled = false;
+    submitBtn.textContent = '送信する';
+    applyType(currentType);
+    fetchThread();
+  }, 2500);
 });
 
-async function submitToGoogleForm(data){
-  const endpoint = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`;
-  const body = new FormData();
-  body.append(ENTRY.type, data.type);
-  body.append(ENTRY.subject, data.subject);
-  body.append(ENTRY.content, data.content);
-  body.append(ENTRY.link, data.link);
-  body.append(ENTRY.xid, data.xid);
-
-  // Googleフォームはno-corsでのみ受け付けるため、送信成否はJS側から読み取れない
-  return fetch(endpoint, { method: 'POST', mode: 'no-cors', body });
-}
+/* ---------- 初期表示 ---------- */
+fetchThread();
 </script>
 </body>
 </html>
