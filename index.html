@@ -40,7 +40,7 @@
   .toast.show{opacity:1;}
 
   .tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--line);}
-  .tab{flex:1;background:none;border:none;font-weight:700;font-size:14.5px;padding:8px 6px 12px;color:var(--muted);cursor:pointer;position:relative;}
+  .tab{flex:1;background:none;border:none;font-weight:700;font-size:14.5px;padding:8px 6px 12px;color:var(--muted);cursor:pointer;position:relative;transition:color .2s ease;}
   .tab[aria-selected="true"]{color:var(--ink);}
   .tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent);}
 
@@ -62,38 +62,50 @@
   .submit{
     width:100%;background:var(--accent);color:#fff;border:none;
     font-weight:700;font-size:14.5px;padding:12px;cursor:pointer;margin-top:4px;
+    transition:opacity .2s ease, background .2s ease;
   }
   .submit:hover{opacity:.9;}
   .submit:disabled{background:var(--muted);cursor:default;}
 
   .note{font-size:11.5px;color:var(--muted);margin-top:12px;line-height:1.7;}
 
-  .done{display:none;text-align:center;padding:20px 10px 10px;}
-  .done.show{display:block;}
+  .done{text-align:center;padding:20px 10px 10px;}
+
   .done .stamp{
     display:inline-block;font-weight:700;font-size:14px;color:var(--accent);
     border:1px solid var(--accent);padding:6px 16px;margin-bottom:14px;
   }
   .done p{font-size:13.5px;line-height:1.8;color:#555;}
 
-  form.hidden{display:none;}
-
   .main-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--line);}
-  .main-tab{flex:1;background:none;border:none;font-weight:700;font-size:15px;padding:10px 6px 14px;color:var(--muted);cursor:pointer;position:relative;}
+  .main-tab{flex:1;background:none;border:none;font-weight:700;font-size:15px;padding:10px 6px 14px;color:var(--muted);cursor:pointer;position:relative;transition:color .2s ease;}
   .main-tab.active{color:var(--ink);}
   .main-tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--accent);}
+
+  /* ---- 画面切り替えの共通トランジション ---- */
+  .view{transition:opacity .22s ease, transform .22s ease;}
+  .view-hidden{opacity:0;}
+  .view-out-left{transform:translateX(-14px);}
+  .view-out-right{transform:translateX(14px);}
+  .view-in-left{transform:translateX(14px);}
+  .view-in-right{transform:translateX(-14px);}
 
   .history-item{
     display:flex;justify-content:space-between;align-items:center;gap:10px;
     padding:14px 4px;border-bottom:1px solid var(--line);cursor:pointer;
+    transition:background .15s ease;
   }
+  .history-item:active{background:#f7f6f2;}
   .history-item:last-child{border-bottom:none;}
-  .history-item .subject{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .history-item .meta{font-size:11px;color:var(--muted);white-space:nowrap;}
-  .history-item .chevron{color:var(--muted);font-size:14px;}
-  .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:10px;margin-right:8px;}
+  .history-item .main{min-width:0;}
+  .history-item .subject{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px;}
+  .history-item .preview{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .history-item .meta{font-size:10.5px;color:var(--muted);white-space:nowrap;margin-top:5px;}
+  .history-item .chevron{color:var(--muted);font-size:14px;flex-shrink:0;}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:10px;margin-right:6px;}
   .badge.pending{background:#fbe9e5;color:#b5533c;}
   .badge.done{background:#e7f0e9;color:#4a7a5c;}
+  .type-tag{display:inline-block;font-size:10px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:10px;padding:1px 7px;margin-right:6px;}
 
   .back-btn{
     background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;
@@ -127,7 +139,7 @@
   </div>
 
   <!-- ==================== 送信タブ ==================== -->
-  <div id="submitSection">
+  <div id="submitSection" class="view">
 
     <p class="switch-code">別の端末でも続きを見たい場合は <a id="saveLinkBtn">このページの保存用リンクをコピー</a></p>
 
@@ -137,7 +149,7 @@
         <button class="tab" role="tab" aria-selected="false" data-type="掲載依頼">掲載依頼</button>
       </div>
 
-      <form id="tipForm" novalidate>
+      <form id="tipForm" class="view" novalidate>
         <div class="hp" aria-hidden="true">
           <label for="website">Website</label>
           <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
@@ -167,7 +179,7 @@
         <p class="note">送信内容は運営者本人のみが確認します。第三者には公開されません。</p>
       </form>
 
-      <div class="done" id="done">
+      <div class="done view" id="done" style="display:none;">
         <span class="stamp">送信済み</span>
         <p>送信が完了しました。<br>「履歴」タブに反映されるまで少し時間がかかることがあります。</p>
       </div>
@@ -175,18 +187,18 @@
   </div>
 
   <!-- ==================== 履歴タブ ==================== -->
-  <div id="historySection" style="display:none;">
+  <div id="historySection" class="view" style="display:none;">
     <div class="card">
 
       <!-- 一覧表示 -->
-      <div id="historyListView">
+      <div id="historyListView" class="view">
         <div id="historyList">
           <p class="empty-state">まだ送信履歴はありません。</p>
         </div>
       </div>
 
       <!-- 詳細表示 -->
-      <div id="historyDetailView" style="display:none;">
+      <div id="historyDetailView" class="view" style="display:none;">
         <button type="button" class="back-btn" id="backBtn">← 一覧に戻る</button>
         <div id="historyDetailContent"></div>
       </div>
@@ -233,6 +245,25 @@ function showToast(msg){
   setTimeout(()=>toast.classList.remove('show'), 2000);
 }
 
+/* ---------- 画面切り替え共通のフェード/スライド ---------- */
+function switchView(hideEl, showEl, direction){
+  // direction: 'forward'(次の画面へ進む) or 'back'(前の画面に戻る)
+  const outClass = direction === 'back' ? 'view-out-right' : 'view-out-left';
+  const inClass  = direction === 'back' ? 'view-in-left' : 'view-in-right';
+
+  hideEl.classList.add('view-hidden', outClass);
+
+  setTimeout(() => {
+    hideEl.style.display = 'none';
+    hideEl.classList.remove('view-hidden', outClass);
+
+    showEl.style.display = '';
+    showEl.classList.add('view-hidden', inClass);
+    void showEl.offsetWidth; // reflow
+    showEl.classList.remove('view-hidden', inClass);
+  }, 180);
+}
+
 /* ---------- スレッドコードの発行・管理(裏側で自動、通常は非表示) ---------- */
 function generateCode(){
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 紛らわしい文字(0/O, 1/I等)を除外
@@ -275,14 +306,17 @@ const historySection = document.getElementById('historySection');
 
 document.querySelectorAll('.main-tab').forEach(btn => {
   btn.addEventListener('click', () => {
+    if(btn.classList.contains('active')) return;
+    const isHistory = btn.dataset.section === 'history';
     document.querySelectorAll('.main-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    const isHistory = btn.dataset.section === 'history';
-    submitSection.style.display = isHistory ? 'none' : '';
-    historySection.style.display = isHistory ? '' : 'none';
+
     if(isHistory){
-      showHistoryList();
+      switchView(submitSection, historySection, 'forward');
+      showHistoryList(true);
       fetchThread();
+    } else {
+      switchView(historySection, submitSection, 'back');
     }
   });
 });
@@ -310,9 +344,14 @@ function renderHistoryList(){
     const originalIndex = historyRows.length - 1 - i;
     const status = r.status || '未対応';
     const badgeClass = status === '対応済み' ? 'done' : 'pending';
+    const preview = (r.content || '').replace(/\s+/g, ' ').trim();
     return `
       <div class="history-item" onclick="openHistoryDetail(${originalIndex})">
-        <div class="subject"><span class="badge ${badgeClass}">${status}</span>${escapeHtml(r.subject || '(件名なし)')}</div>
+        <div class="main">
+          <div class="subject">${escapeHtml(r.subject || '(件名なし)')}</div>
+          <div class="preview">${escapeHtml(preview)}</div>
+          <div class="meta"><span class="type-tag">${escapeHtml(r.type || '')}</span><span class="badge ${badgeClass}">${status}</span>${escapeHtml(r.ts || '')}</div>
+        </div>
         <div class="chevron">›</div>
       </div>`;
   }).join('');
@@ -340,16 +379,22 @@ function openHistoryDetail(index){
     </div>`}
   `;
 
-  historyListView.style.display = 'none';
-  historyDetailView.style.display = '';
+  switchView(historyListView, historyDetailView, 'forward');
 }
 
-function showHistoryList(){
-  historyDetailView.style.display = 'none';
-  historyListView.style.display = '';
+function showHistoryList(instant){
+  const reset = el => el.classList.remove('view-hidden','view-out-left','view-out-right','view-in-left','view-in-right');
+  if(instant){
+    historyDetailView.style.display = 'none';
+    historyListView.style.display = '';
+    reset(historyDetailView);
+    reset(historyListView);
+  } else {
+    switchView(historyDetailView, historyListView, 'back');
+  }
 }
 
-document.getElementById('backBtn').addEventListener('click', showHistoryList);
+document.getElementById('backBtn').addEventListener('click', () => showHistoryList(false));
 
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -407,18 +452,16 @@ form.addEventListener('submit', async (e) => {
     console.error(err);
   }
 
-  form.classList.add('hidden');
-  done.classList.add('show');
+  switchView(form, done, 'forward');
 
   setTimeout(() => {
-    form.classList.remove('hidden');
-    done.classList.remove('show');
+    switchView(done, form, 'back');
     form.reset();
     submitBtn.disabled = false;
     submitBtn.textContent = '送信する';
     applyType(currentType);
     fetchThread();
-  }, 2500);
+  }, 2700);
 });
 
 /* ---------- 初期表示 ---------- */
