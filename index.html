@@ -46,7 +46,7 @@
 
   .field{margin-bottom:18px;}
   .field.is-hidden{display:none;}
-  .field label{display:block;font-size:12.5px;font-weight:700;margin-bottom:6px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;margin-bottom:6px;transition:opacity .15s ease;}
   .field .hint{font-size:11.5px;color:var(--muted);font-weight:400;margin-left:6px;}
   .field input[type=text],
   .field textarea{
@@ -56,6 +56,14 @@
   .field input:focus,
   .field textarea:focus{outline:1px solid var(--accent);outline-offset:0;}
   .field textarea{resize:vertical;min-height:160px;line-height:1.6;}
+
+  #linkField{
+    transition:opacity .25s ease, max-height .3s ease, margin-bottom .3s ease;
+    max-height:90px; overflow:hidden;
+  }
+  #linkField.is-hidden{
+    display:block; opacity:0; max-height:0; margin-bottom:0; pointer-events:none;
+  }
 
   .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
 
@@ -118,6 +126,13 @@
   .detail-block.reply{border-left-color:var(--accent);}
   .detail-block .who{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px;}
   .detail-block .body{font-size:13.5px;line-height:1.7;white-space:pre-wrap;}
+
+  .follow-up{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);}
+  .follow-up textarea{
+    width:100%;font-family:inherit;font-size:16px;padding:9px 10px;
+    border:1px solid var(--line);min-height:80px;resize:vertical;margin-bottom:10px;
+  }
+  .follow-up textarea:focus{outline:1px solid var(--accent);outline-offset:0;}
 
   .empty-state{font-size:12.5px;color:var(--muted);text-align:center;padding:20px 0;}
 
@@ -238,6 +253,7 @@ const historyDetailContent = document.getElementById('historyDetailContent');
 
 let currentType = '情報提供';
 let historyRows = [];
+let historyThreads = [];
 
 function showToast(msg){
   toast.textContent = msg;
@@ -333,24 +349,37 @@ async function fetchThread(){
   }
 }
 
+function groupThreads(rows){
+  const map = new Map();
+  rows.forEach((r, idx) => {
+    const key = r.subject || '(件名なし)';
+    if(!map.has(key)) map.set(key, { subject: r.subject, type: r.type, messages: [], lastIndex: idx });
+    const t = map.get(key);
+    t.messages.push(r);
+    t.lastIndex = idx;
+  });
+  // 直近にやり取りがあったスレッドを上に
+  return Array.from(map.values()).sort((a, b) => b.lastIndex - a.lastIndex);
+}
+
 function renderHistoryList(){
-  if(!historyRows || historyRows.length === 0){
+  historyThreads = groupThreads(historyRows);
+  if(historyThreads.length === 0){
     historyList.innerHTML = '<p class="empty-state">まだ送信履歴はありません。</p>';
     return;
   }
-  // 新しいものを上に
-  const rows = [...historyRows].reverse();
-  historyList.innerHTML = rows.map((r, i) => {
-    const originalIndex = historyRows.length - 1 - i;
-    const status = r.status || '未対応';
+  historyList.innerHTML = historyThreads.map((t, i) => {
+    const last = t.messages[t.messages.length - 1];
+    const status = last.status || '未対応';
     const badgeClass = status === '対応済み' ? 'done' : 'pending';
-    const preview = (r.content || '').replace(/\s+/g, ' ').trim();
+    const preview = (last.reply || last.content || '').replace(/\s+/g, ' ').trim();
+    const countTag = t.messages.length > 1 ? ` ・ ${t.messages.length}件` : '';
     return `
-      <div class="history-item" onclick="openHistoryDetail(${originalIndex})">
+      <div class="history-item" onclick="openHistoryDetail(${i})">
         <div class="main">
-          <div class="subject">${escapeHtml(r.subject || '(件名なし)')}</div>
+          <div class="subject">${escapeHtml(t.subject || '(件名なし)')}</div>
           <div class="preview">${escapeHtml(preview)}</div>
-          <div class="meta"><span class="type-tag">${escapeHtml(r.type || '')}</span><span class="badge ${badgeClass}">${status}</span>${escapeHtml(r.ts || '')}</div>
+          <div class="meta"><span class="type-tag">${escapeHtml(t.type || '')}</span><span class="badge ${badgeClass}">${status}</span>${escapeHtml(last.ts || '')}${countTag}</div>
         </div>
         <div class="chevron">›</div>
       </div>`;
@@ -358,28 +387,70 @@ function renderHistoryList(){
 }
 
 function openHistoryDetail(index){
-  const r = historyRows[index];
-  if(!r) return;
+  const t = historyThreads[index];
+  if(!t) return;
+  renderThreadDetail(t);
+  switchView(historyListView, historyDetailView, 'forward');
+}
 
-  historyDetailContent.innerHTML = `
-    <div class="detail-subject">${escapeHtml(r.subject || '(件名なし)')}</div>
-    <div class="detail-meta">${escapeHtml(r.type || '')}${r.ts ? ' ・ ' + escapeHtml(r.ts) : ''}</div>
+function renderThreadDetail(t){
+  const blocks = t.messages.map(m => {
+    let html = `
     <div class="detail-block">
-      <div class="who">あなた</div>
-      <div class="body">${escapeHtml(r.content || '')}</div>
-    </div>
-    ${r.reply ? `
+      <div class="who">あなた${m.ts ? ' ・ ' + escapeHtml(m.ts) : ''}</div>
+      <div class="body">${escapeHtml(m.content || '')}</div>
+    </div>`;
+    if(m.reply){
+      html += `
     <div class="detail-block reply">
       <div class="who">運営からの返信</div>
-      <div class="body">${escapeHtml(r.reply)}</div>
-    </div>` : `
-    <div class="detail-block">
-      <div class="who">運営からの返信</div>
-      <div class="body empty-state" style="padding:4px 0;">まだ返信はありません</div>
-    </div>`}
+      <div class="body">${escapeHtml(m.reply)}</div>
+    </div>`;
+    }
+    return html;
+  }).join('');
+
+  historyDetailContent.innerHTML = `
+    <div class="detail-subject">${escapeHtml(t.subject || '(件名なし)')}</div>
+    <div class="detail-meta">${escapeHtml(t.type || '')}</div>
+    ${blocks}
+    <div class="follow-up">
+      <textarea id="followUpText" maxlength="3000" placeholder="この件について続けて伝えたいことがあれば入力してください"></textarea>
+      <button type="button" id="followUpBtn" class="submit">追加で送る</button>
+    </div>
   `;
 
-  switchView(historyListView, historyDetailView, 'forward');
+  document.getElementById('followUpBtn').addEventListener('click', () => sendFollowUp(t));
+}
+
+async function sendFollowUp(t){
+  const textarea = document.getElementById('followUpText');
+  const text = textarea.value.trim();
+  if(!text) return;
+
+  const btn = document.getElementById('followUpBtn');
+  btn.disabled = true;
+  btn.textContent = '送信中…';
+
+  const data = {
+    type: t.type,
+    subject: t.subject,
+    content: text,
+    link: '',
+    xid: '',
+    threadCode: threadCode,
+  };
+
+  try{
+    await fetch(WEBAPP_URL, { method: 'POST', body: JSON.stringify(data) });
+  }catch(err){
+    console.error(err);
+  }
+
+  await fetchThread();
+  const updated = historyThreads.find(x => x.subject === t.subject);
+  if(updated) renderThreadDetail(updated);
+  showToast('送信しました');
 }
 
 function showHistoryList(instant){
@@ -409,11 +480,18 @@ const copy = {
 function applyType(type){
   currentType = type;
   tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.type === type ? 'true' : 'false'));
-  subjectLabel.textContent = copy[type].subjectLabel;
-  subjectInput.placeholder = copy[type].subjectPlaceholder;
-  contentLabel.textContent = copy[type].contentLabel;
-  contentInput.placeholder = copy[type].contentPlaceholder;
+
+  [subjectLabel, contentLabel].forEach(el => el.style.opacity = '0');
   linkField.classList.toggle('is-hidden', !copy[type].showLink);
+
+  setTimeout(() => {
+    subjectLabel.textContent = copy[type].subjectLabel;
+    subjectInput.placeholder = copy[type].subjectPlaceholder;
+    contentLabel.textContent = copy[type].contentLabel;
+    contentInput.placeholder = copy[type].contentPlaceholder;
+    subjectLabel.style.opacity = '1';
+    contentLabel.style.opacity = '1';
+  }, 120);
 }
 
 tabs.forEach(tab => tab.addEventListener('click', () => applyType(tab.dataset.type)));
